@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Table Booking</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSwg8ttYbPYuKvjrki-dT1Bev-BYSU1UwDf9g&s');
+            background-repeat: no-repeat;
+            background-size: 100%;
+            background-position: relative;
+        }
+        .form-container {
+            background-color: rgba(255, 255, 255, 0.719);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            width: 350px;
+        }
+        .form-container h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input {
+            background-color: rgba(255, 255, 255, 0.863);
+            width: 100%;
+            padding: 12px 20px;
+            box-sizing: border-box;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .form-group select {
+            background-color: rgba(255, 255, 255, 0.863);
+            width: 100%;
+            padding: 12px 20px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .form-group input:focus, .form-group select:focus {
+            border-color: #007BFF;
+            box-shadow: 0 0 8px rgba(0, 123, 255, 0.3);
+        }
+        .form-group input[type="button"], .form-group input[type="submit"] {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .form-group input[type="button"]:hover, .form-group input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        .back-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: #ff0000;
+            color: white;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .back-button:hover {
+            background-color: #ff0000;
+        }
+    </style>
+    <script>
+        async function checkTable(event) {
+            event.preventDefault();
+            const table = document.getElementById('table').value;
+            const date = document.getElementById('date').value;
+            const hours = document.getElementById('hours').value;
+            const period = document.getElementById('period').value;
+
+            const time = hours + ' ' + period;
+
+            const response = await fetch('/check_table', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ table, date, time }),
+            });
+
+            const result = await response.json();
+            alert(result.message);
+        }
+
+        async function bookTable(event) {
+            event.preventDefault();
+            const name = document.getElementById('name').value;
+            const phone = document.getElementById('phone').value;
+            const table = document.getElementById('table').value;
+            const date = document.getElementById('date').value;
+            const hours = document.getElementById('hours').value;
+            const period = document.getElementById('period').value;
+
+            const time = hours + ' ' + period;
+
+            const response = await fetch('/book_table', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ name, phone, table, date, time }),
+            });
+
+            const result = await response.json();
+            alert(result.message);
+
+            if (result.success) {
+                document.getElementById('name').value = '';
+                document.getElementById('phone').value = '';
+                document.getElementById('table').value = '';
+                document.getElementById('date').value = '';
+                document.getElementById('hours').value = '';
+                document.getElementById('period').value = '';
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="form-container">
+        <button class="back-button" onclick="window.history.back()">Back</button>
+        <div class="left-panel">
+        <h2>Table Booking</h2>
+        <form>
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone Number:</label>
+                <input type="tel" id="phone" name="phone" required>
+            </div>
+            <div class="form-group">
+                <label for="table">Table No:</label>
+                <select id="table" name="table" required>
+                    <option value="">Select a table</option>
+                    <option value="table1">Table 1</option>
+                    <option value="table2">Table 2</option>
+                    <option value="table3">Table 3</option>
+                    <option value="table4">Table 4</option>
+                    <option value="table5">Table 5</option>
+                    <option value="table6">Table 6</option>
+                    <option value="table7">Table 7</option>
+                    <option value="table8">Table 8</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="date">Date:</label>
+                <input type="date" id="date" name="date" required>
+            </div>
+            <div class="form-group">
+                <label for="time">Time:</label>
+                <select id="hours" name="hours" required>
+                    <option value="">Hour</option>
+                    <option value="1">01</option>
+                    <option value="2">02</option>
+                    <option value="3">03</option>
+                    <option value="4">04</option>
+                    <option value="5">05</option>
+                    <option value="6">06</option>
+                    <option value="7">07</option>
+                    <option value="8">08</option>
+                    <option value="9">09</option>
+                    <option value="10">10</option>
+                    <option value="11">11</option>
+                    <option value="12">12</option>
+                </select>
+                <select id="period" name="period" required>
+                    <option value="">AM/PM</option>
+                    <option value="AM">AM</option>
+                    <option value="PM">PM</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <input type="button" value="Check Table" onclick="checkTable(event)">
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Book Table" onclick="bookTable(event)">
+            </div>
+        </form>
+    </div>
+</body>
+</html>

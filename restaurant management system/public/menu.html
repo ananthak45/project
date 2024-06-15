@@ -1,0 +1,211 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Table</title>
+    <style>/* public/styles.css */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .content {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .card {
+            max-width: 360px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 40px 30px;
+        }
+        
+        .restaurant-name {
+            margin-left: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .menu-table {
+            width: 100%;
+            max-width: 800px;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .menu-table th, .menu-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        
+        .menu-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        
+        .menu-table img {
+            width: 100px;
+            height: auto;
+        }
+        
+        .form-container {
+            display: none;
+            margin-top: 20px;
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .form-container input, .form-container button {
+            display: block;
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 10px;
+            font-size: 16px;
+        }
+        
+        .toggle-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        </style>>
+</head>
+<body>
+    <div class="container">
+        <div class="content">
+            <div class="card">
+                <!-- Your card content -->
+            </div>
+            <div class="restaurant-name">
+                Raya Restaurant
+            </div>
+        </div>
+        <table class="menu-table">
+            <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>Name</th>
+                    <th>Price</th>
+                </tr>
+            </thead>
+            <tbody id="menu-body">
+                <!-- Menu items will be inserted here -->
+            </tbody>
+        </table>
+        <button class="toggle-button" onclick="toggleForm()">Add New Item</button>
+        <div class="form-container" id="form-container">
+            <input type="text" id="name" placeholder="Name" required>
+            <input type="number" id="price" placeholder="Price" required>
+            <input type="text" id="image_url" placeholder="Image URL" required>
+            <button onclick="addMenuItem()">Submit</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('/menu')
+                .then(response => response.json())
+                .then(data => {
+                    const menuBody = document.getElementById('menu-body');
+                    data.forEach(item => {
+                        const row = document.createElement('tr');
+                        
+                        const imgCell = document.createElement('td');
+                        const img = document.createElement('img');
+                        img.src = item.image_url;
+                        img.alt = item.name;
+                        imgCell.appendChild(img);
+                        
+                        const nameCell = document.createElement('td');
+                        nameCell.textContent = item.name;
+                        
+                        const priceCell = document.createElement('td');
+                        priceCell.textContent = `₹${item.price.toFixed(2)}`;
+                        
+                        row.appendChild(imgCell);
+                        row.appendChild(nameCell);
+                        row.appendChild(priceCell);
+                        
+                        menuBody.appendChild(row);
+                    });
+                })
+                .catch(error => console.error('Error fetching menu:', error));
+        });
+
+        function toggleForm() {
+            const formContainer = document.getElementById('form-container');
+            formContainer.style.display = formContainer.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function addMenuItem() {
+            const name = document.getElementById('name').value;
+            const price = document.getElementById('price').value;
+            const image_url = document.getElementById('image_url').value;
+
+            fetch('/menu', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name, price, image_url })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const menuBody = document.getElementById('menu-body');
+                const row = document.createElement('tr');
+                
+                const imgCell = document.createElement('td');
+                const img = document.createElement('img');
+                img.src = data.image_url;
+                img.alt = data.name;
+                imgCell.appendChild(img);
+                
+                const nameCell = document.createElement('td');
+                nameCell.textContent = data.name;
+                
+                const priceCell = document.createElement('td');
+                priceCell.textContent = `₹${data.price.toFixed(2)}`;
+                
+                row.appendChild(imgCell);
+                row.appendChild(nameCell);
+                row.appendChild(priceCell);
+                
+                menuBody.appendChild(row);
+                
+                toggleForm();
+                document.getElementById('name').value = '';
+                document.getElementById('price').value = '';
+                document.getElementById('image_url').value = '';
+            })
+            .catch(error => console.error('Error adding menu item:', error));
+        }
+    </script>
+</body>
+</html>
